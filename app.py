@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 import xxhash
+
+import os
+from flask import Flask, redirect
+from flask import request
+from flask import jsonify
 #print(xxhash.xxh64('xxhash').hexdigest())
 #print(xxhash.xxh64('xxhash', seed=20141025).hexdigest())
+
+app = Flask(__name__)
 
 key = "default"
 split = 4
 numMaxT = 10000000
+version = "1.0"
 
 def intKey():
     global key
@@ -193,5 +201,59 @@ def ask():
     else:
         print("That's not a valid answer, let's try again.")
         ask()
+
+#    ask()
+
+
+#Flask code
+@app.route('/')
+def hello():
+    view = "<title>Contemplation</title>"
+    view = view + "<h3> Hash-Reversal encoder-decoder \"Contemplation\"</h3>"
+    view = view + "<br \\>-----------------------------------------------------------------------<br \\>"
+    view = view + "<h4>Encode</h4>"
+    view = view + "<form action=\" " + "/enc" + "\" method=\"post\">"
+    view = view + "<input type=\"text\" name=\"msg\">"
+    view = view + "<input type=\"submit\">"
+    view = view + "</form>"
+    
+    view = view + "<h4>Decode</h4>"
+    view = view + "<form action=\" " + "/dec" + "\" method=\"post\">"
+    view = view + "<input type=\"text\" name=\"msg\">"
+    view = view + "<input type=\"submit\">"
+    view = view + "</form>"
+
+    view = view + "<br \\>-----------------------------------------------------------------------<br \\>"
+    
+    view = view + "<br \\><hr \\>"
+    view = view + "Contemplation v. " + str(version) + " | <a href=\"https://raw.githubusercontent.com/jonnelafin/A-/master/LICENSE\">LICENSE</a>"
+    return view
+@app.route('/enc', methods=['POST'])
+def handle_data():
+    msg = request.form['msg']
+    view = ""
+    
+    to = process(msg)
+    print("Encoded: " + to)
+    view = view + "<br \\>"
+    view = view + "Encoded: " + "<br \\>" + to
+    view = view + "<br \\>"
+    by = deProcess(to)
+    print("Will produce: " + by)
+    view = view + "Will produce: " + "<br \\>" + by
+    view = view + "<br \\>"
+    return view
+#    return redirect("/", code=302)
+@app.route('/dec', methods=['POST'])
+def handle_data2():
+    msg = request.form['msg']
+    view = ""
+    
+    by = deProcess(msg)
+    print("Decoded: " + by)
+    view = view + "Decoded: " + "<br \\>" + by
+    view = view + "<br \\>"
+    return view
 if __name__ == "__main__":
-    ask()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

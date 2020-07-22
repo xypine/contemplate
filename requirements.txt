@@ -1,1 +1,2 @@
 xxHash
+Flask==1.0
